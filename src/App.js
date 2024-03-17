@@ -1,13 +1,11 @@
 import React from "react";
 import Puzzle from "./components/Puzzle";
-import Puzzle1 from "./components/Puzzle1";
+// import Puzzle from "./components/Puzzle";
 
 export default function App() {
-
-
   return (
-    <div>
-      <Puzzle1 />
+    <div className="app">
+      <Puzzle />
     </div>
   )
 }

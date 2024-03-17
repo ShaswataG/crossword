@@ -1,50 +1,65 @@
-import React from "react"
-import Crossword from '@jaredreisinger/react-crossword';
+import React, { useEffect, useRef } from 'react'
+import data from '../data'
+import Crossword from '@jaredreisinger/react-crossword'
+import Confetti from 'react-confetti'
 
 export default function Puzzle() {
-    const [win, setWin] = React.useState(false)
+	const [win, setWin] = React.useState(false)
+  const [loose, setLoose] = React.useState(false)
+  const [multipleSubmit, setMultipleSubmit] = React.useState(false)
+	const puzzleRef = useRef(Crossword)
 
-    const data = {
-      across: {
-        1: {
-          clue: 'one plus one',
-          answer: 'TWO',
-          row: 0,
-          col: 0,
-        },
-        // 2: {
-        //   clue: 'one plus one',
-        //   answer: 'TWO',
-        //   row: 1,
-        //   col: 0,
-        // },
-      },
-      down: {
-        3: {
-          clue: 'three minus two',
-          answer: 'ONE',
-          row: 0,
-          col: 2,
-        },
-        // 4: {
-        //   clue: 'one plus one',
-        //   answer: 'TWO',
-        //   row: 3,
-        //   col: 4,
-        // },
-      },
+	const checkAnswers = () => {
+    if (!win && !loose) {
+      const status = puzzleRef.current.isCrosswordCorrect()
+      console.log('win')
+      setWin(status)
+      setLoose(!status)
+    } else {
+      setMultipleSubmit(true)
     }
-  
-    const checkAnswers= () => {
-      console.log("win")
-      setWin(true)
-    }
-  
-    return (
-      <div className="puzzle">
-        <h1>PHOENIX 2024</h1>
-        <Crossword data={data} onCrosswordCorrect={checkAnswers}/>
-        {win && <h1>yguyg</h1>}
+	}
+
+  const showAnswers = () => {
+    puzzleRef.current.fillAllAnswers()
+    setLoose(true)
+  }
+
+  const reset = () => {
+    puzzleRef.current.reset()
+    setWin(false)
+    setLoose(false)
+    setMultipleSubmit(false)
+  }
+
+	useEffect(() => {
+		reset()
+	}, [])
+
+	return (
+		<div className="puzzle">
+      {win && <Confetti height="4000vh"/>}
+			<h1>CROSSWORD</h1>
+      <div className='crossword-box'>
+        <Crossword
+          ref={puzzleRef}
+          data={data}
+          // onCrosswordCorrect={checkAnswers}
+          // onCellChange={(a, b, c) => console.log('change', a, b, c)}
+        />
       </div>
-    )
+      <div className='warning'>
+        {multipleSubmit && <span><h3>You can't submit more than once</h3></span>}
+      </div>
+      <div className='buttons'>
+        <button onClick={checkAnswers}>Submit</button>
+        {/* <button onClick={showAnswers}>Show Answers</button> */}
+        <button onClick={reset}>Reset</button>
+      </div>
+      <div className='results'>
+        {win && <div><h1>Congratulations!</h1><br/><h1>You won</h1></div>}
+        {loose && <h1>You lost</h1>}
+      </div>
+    </div>
+	)
 }
